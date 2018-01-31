@@ -27,20 +27,27 @@ class ViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        let earthNode = SCNNode(geometry: SCNSphere(radius: 0.3))
-        earthNode.position = SCNVector3(0,1,1)
-        earthNode.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "EarthD")
-        earthNode.geometry?.firstMaterial?.specular.contents = UIImage(named: "EarthSpec")
-        earthNode.geometry?.firstMaterial?.emission.contents = #imageLiteral(resourceName: "EarthClouds")
-        sceneView.scene.rootNode.addChildNode(earthNode)
+        let earthNode = createPlanet(radius: 0.1, position:  SCNVector3(1.2,0,0), diffuseContent: #imageLiteral(resourceName: "EarthD"), specularContent: nil, emissionContent: #imageLiteral(resourceName: "EarthClouds"))
+        let sunNode = createPlanet(radius: 0.3, position: SCNVector3(0,0,-1), diffuseContent: #imageLiteral(resourceName: "Sun"), specularContent: nil, emissionContent: nil)
+        let action = SCNAction.rotateBy(x: 0, y: CGFloat(350.degreesToRadians), z: 0, duration: 8)
+        let foreverRotateY = SCNAction.repeatForever(action)
+        sunNode.runAction(foreverRotateY)
         
-        let sunNode = SCNNode(geometry: SCNSphere(radius: 0.4))
-        sunNode.geometry?.firstMaterial?.diffuse.contents = #imageLiteral(resourceName: "Sun")
-        sunNode.position = SCNVector3(0,0.3,0.3)
+        let venus = createPlanet(radius: 0.1, position: SCNVector3(0.6,0,0), diffuseContent: #imageLiteral(resourceName: "VenusD"), specularContent: nil, emissionContent: #imageLiteral(resourceName: "VenusE"))
+        sunNode.addChildNode(venus)
+        sunNode.addChildNode(earthNode)
+        sceneView.scene.rootNode.addChildNode(sunNode)
+    }
+    
+    func createPlanet(radius: CGFloat, position: SCNVector3,
+                diffuseContent: UIImage, specularContent: UIImage?, emissionContent: UIImage?) -> SCNNode {
+        let planet = SCNNode(geometry: SCNSphere(radius: radius))
+        planet.position = position
+        planet.geometry?.firstMaterial?.diffuse.contents = diffuseContent
+        planet.geometry?.firstMaterial?.specular.contents = specularContent
+        planet.geometry?.firstMaterial?.emission.contents = emissionContent
         
-        let earthAction = SCNAction.rotateBy(x: 0, y: CGFloat(360.degreesToRadians), z: 0, duration: 8)
-        let earthActionLoop = SCNAction.repeatForever(earthAction)
-        earthNode.runAction(earthActionLoop)
+        return planet
     }
 
 }
